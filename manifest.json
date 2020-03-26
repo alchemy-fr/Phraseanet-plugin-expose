@@ -1,0 +1,15 @@
+{
+  "name": "phraseanet-plugin-expose",
+  "description" : "Phraseanet Plugin Expose",
+  "keywords"    : ["service", "plugin", "expose", "phraseanet"],
+  "license"     : "MIT",
+  "version"     : "1.0.0",
+  "minimum-phraseanet-version": "4",
+  "maximum-phraseanet-version": "4.1.100",
+  "twig-paths": ["views"],
+  "services" : [
+    {
+      "class": "Alchemy\\ExposePlugin\\Provider\\ControllerServiceProvider"
+    }
+  ]
+}

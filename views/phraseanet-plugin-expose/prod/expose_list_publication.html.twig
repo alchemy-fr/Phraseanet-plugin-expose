@@ -1,0 +1,21 @@
+<table class="table table-condensed">
+    <thead>
+    <tr>
+        <td>id</td>
+        <td>title</td>
+        <td>description</td>
+        <td>slug</td>
+    </tr>
+    </thead>
+    <tbody>
+        {% for publication in publications %}
+            <tr>
+                <td>{{ publication.id }}</td>
+                <td>{{ publication.title }}</td>
+                <td>{{ publication.description }}</td>
+                <td>{{ publication.slug }}</td>
+            </tr>
+        {% endfor %}
+    </tbody>
+
+</table>

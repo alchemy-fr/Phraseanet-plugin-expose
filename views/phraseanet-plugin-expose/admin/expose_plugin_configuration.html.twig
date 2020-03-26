@@ -1,0 +1,25 @@
+<h1>Expose plugin setting</h1>
+
+{{ form_start(form, {'action': path('expose_plugin_admin_configuration')}) }}
+
+<div class="control-group">
+    {{ form_row(form.oauthBaseUri) }}
+</div>
+
+<div class="control-group">
+    {{ form_row(form.exposeBaseUri) }}
+</div>
+
+<div class="control-group">
+    {{ form_row(form.clientSecret) }}
+</div>
+
+<div class="control-group">
+    {{ form_row(form.clientId) }}
+</div>
+
+<div class="control-group">
+    <input type="submit" class="btn btn-primary" value={{ "Save"|trans }} />
+</div>
+
+{{ form_end(form) }}

@@ -1,0 +1,4 @@
+expose_plugin:
+  endpointToken: 'this is text value'
+  clientSecret: 6
+  clientId: 'this is textarea value'

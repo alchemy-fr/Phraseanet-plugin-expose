@@ -1,0 +1,12 @@
+{
+  "name"        : "phraseanet plugin expose",
+  "description" : "Phraseanet plugin expose",
+  "license"     : "MIT",
+  "require": {},
+  "require-dev": {},
+  "autoload": {
+    "psr-4": {
+      "Alchemy\\ExposePlugin\\"        : "src/"
+    }
+  }
+}
