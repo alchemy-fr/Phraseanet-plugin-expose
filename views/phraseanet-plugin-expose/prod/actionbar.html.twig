@@ -1,12 +1,8 @@
-{#{% set config = app['plugin.skeleton.config'].skeleton %}#}
-{#{% set requestor = app.getAuthenticatedUser().getLogin() %}#}
-
 {#
  #  this template is rendered at the end of the toolbar
  #
  #  because many plugings will add their own js code, please wrap the global code into an object
  #  with a unique name to prevent names conflicts
- #  here the (unused) global object is "skeletonJS"
  #}
 
 <script type="text/javascript">
@@ -60,54 +56,4 @@
         });
     });
 
-    /**
-     * option 2 of actionbar "push" dropdown
-     */
-    $(document).on('click', '.TOOL_skeleton_btn_2', function () {
-        var $lst = null;
-        var $ssel = null;
-
-        if ($(this).hasClass('results_window')) {
-            $lst = searchResult.selection.serialize();
-        }
-        else if($(this).hasClass('basket_window')){
-            $lst = workzoneOptions.selection.serialize();
-
-            if (workzoneOptions.selection.length() === 0){
-                $ssel = $('.SSTT.active').attr('id').split('_').slice(1, 2).pop();
-            }
-        }
-        var $dialog = dialog.create({}, {
-            size: 'Medium',
-            title: 'Skeleton'
-        }, 2);
-
-        $.ajax({
-            type: "POST",
-            url: "../skeleton_2/",
-            dataType: 'html',
-            data: {
-                'dialog_level': 2,
-                lst: $lst,
-                ssel: $ssel
-            },
-            success: function (data) {
-                $dialog.setContent(data);
-            }
-        });
-    });
-
-    /**
-     *  wrapper for global code (unused)
-     */
-    var skeletonJS = {
-
-        'config' : {{ config|json_encode|raw }},
-        'requestor' : {{ requestor|json_encode|raw }},
-        'deleteImg' : "{{ plugin_asset('phraseanet-plugin-skeleton', 'img/delete.png') }}"
-    }
-
 </script>
-
-
-
