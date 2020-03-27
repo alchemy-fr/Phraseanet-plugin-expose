@@ -1,4 +1,18 @@
 expose_plugin:
-  endpointToken: 'this is text value'
-  clientSecret: 6
-  clientId: 'this is textarea value'
+    clientSecret: 2y5wvlnds8cgwwwwgsc4wgcco4c8gswgww4c48c8osgoocc88s
+    clientId: aina-test_1buc6x7by0tcoccog444skg8g4sgg8gsos08cs4c88gc8s4w0c
+    oauthBaseUri: 'http://163.172.178.207:8060'
+    exposeBaseUri: 'http://163.172.178.207:8050'
+    token: NDIwMjQwNWQ3NDBkMjRlNjdmMzA0ZGZjZTdjYTkxNDljNDBiM2E4ZjU5NTk1NDIxNWY3MjAwNjcwNzUxZmU1NQ
+
+# example of jsondata to create publication
+
+  {
+      "title": "the title",
+      "enabled": true,
+      "layout": "gallery",
+      "publiclyListed": true,
+      "slug": "",
+      "securityMethod": "",
+      "securityOptions": {}
+  }

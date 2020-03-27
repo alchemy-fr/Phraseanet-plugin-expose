@@ -15,7 +15,17 @@
                         Create publication {% if lst %} from {{ lst|split(';')|length }} selected {% endif %}
                     </button>
                     <br/>
-                    <textarea class="publication-data" name="publication-data" rows="10" cols="50" placeholder="Json format"></textarea>
+                    <textarea class="publication-data" name="publication-data" rows="10" cols="50">
+{
+    "title": "the title",
+    "enabled": true,
+    "layout": "gallery",
+    "publiclyListed": true,
+    "slug": "",
+    "securityMethod": "",
+    "securityOptions": {}
+}
+                    </textarea>
                     <span id="pub-error" class="hidden alert alert-error"></span>
                     <span id="pub-success" class="hidden alert alert-success"></span>
                 </div>
