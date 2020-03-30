@@ -97,7 +97,7 @@
             },
             success: function (data) {
                 if (data.success) {
-                    $("#pub-success").removeClass("hidden").text(data.message + " " + data.url);
+                    $("#pub-success").removeClass("hidden").html(data.message + ": " + data.link);
                 } else {
                     $("#pub-error").removeClass("hidden").text(data.message);
                 }

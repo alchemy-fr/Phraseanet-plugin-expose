@@ -1,21 +1,25 @@
 <table class="table table-condensed">
     <thead>
     <tr>
-        <td>id</td>
-        <td>title</td>
         <td>url</td>
-        <td>slug</td>
+        <td>title</td>
+        <td>id</td>
     </tr>
     </thead>
     <tbody>
-        {% for publication in publications %}
-            <tr>
-                <td>{{ publication.id }}</td>
-                <td>{{ publication.title }}</td>
-                <td>{{ publication['@id'] }}</td>
-                <td>{{ publication.slug }}</td>
-            </tr>
-        {% endfor %}
+    {% for publication in publications %}
+        <tr>
+            <td>
+                {% if publication.slug is null %}
+                    <a style='color:blue;' href="{{ exposeFrontUri ~ publication.id }}">{{ exposeFrontUri ~ publication.id }}</a>
+                {% else %}
+                    <a style='color:blue;' href="{{ exposeFrontUri ~ publication.slug }}">{{ exposeFrontUri ~ publication.slug }}</a>
+                {% endif %}
+            </td>
+            <td>{{ publication.title }}</td>
+            <td>{{ publication.id }}</td>
+        </tr>
+    {% endfor %}
     </tbody>
 
 </table>

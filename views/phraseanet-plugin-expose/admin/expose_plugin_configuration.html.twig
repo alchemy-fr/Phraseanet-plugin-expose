@@ -3,6 +3,10 @@
 {{ form_start(form, {'action': path('expose_plugin_admin_configuration')}) }}
 
 <div class="control-group">
+    {{ form_row(form.exposeFrontUri) }}
+</div>
+
+<div class="control-group">
     {{ form_row(form.exposeBaseUri) }}
 </div>
 

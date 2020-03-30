@@ -12,6 +12,12 @@ class ExposePluginConfigurationType extends AbstractType
         parent::buildForm($builder, $options);
 
         $builder
+            ->add('exposeFrontUri', 'text', [
+                'label' => 'Expose Front base uri',
+                'attr'  => [
+                    'class' => 'input-xxlarge'
+                ]
+            ])
             ->add('exposeBaseUri', 'text', [
                 'label' => 'Base Uri Expose api',
                 'attr'  => [

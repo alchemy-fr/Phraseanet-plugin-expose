@@ -46,7 +46,8 @@ class ExposeController extends Controller
             $publications = $body['hydra:member'];
         }
         return $app['twig']->render('phraseanet-plugin-expose/prod/expose_list_publication.html.twig', [
-            'publications' => $publications
+            'publications' => $publications,
+            'exposeFrontUri' => \p4string::addEndSlash($config['exposeFrontUri'])
         ]);
     }
 
@@ -118,10 +119,15 @@ class ExposeController extends Controller
             }
         }
 
+        $path = empty($publicationsResponse['slug']) ? $publicationsResponse['id'] : $publicationsResponse['slug'] ;
+        $url = \p4string::addEndSlash($config['exposeFrontUri']) . $path;
+
+        $link = "<a style='color:blue;' href='" . $url . "'>" . $url . "</a>";
+
         return $app->json([
             'success' => true,
             'message' => "Publication successfully created!",
-            'url'     => $publicationsResponse['@id']
+            'link'    => $link
         ]);
     }
 
