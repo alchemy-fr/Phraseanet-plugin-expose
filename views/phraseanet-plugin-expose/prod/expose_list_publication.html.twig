@@ -3,7 +3,7 @@
     <tr>
         <td>id</td>
         <td>title</td>
-        <td>description</td>
+        <td>url</td>
         <td>slug</td>
     </tr>
     </thead>
@@ -12,7 +12,7 @@
             <tr>
                 <td>{{ publication.id }}</td>
                 <td>{{ publication.title }}</td>
-                <td>{{ publication.description }}</td>
+                <td>{{ publication['@id'] }}</td>
                 <td>{{ publication.slug }}</td>
             </tr>
         {% endfor %}

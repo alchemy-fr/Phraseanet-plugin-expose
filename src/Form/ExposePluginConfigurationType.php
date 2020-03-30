@@ -12,12 +12,6 @@ class ExposePluginConfigurationType extends AbstractType
         parent::buildForm($builder, $options);
 
         $builder
-            ->add('oauthBaseUri', 'text', [
-                'label' => 'Base Uri get token',
-                'attr'  => [
-                    'class' => 'input-xxlarge'
-                ]
-            ])
             ->add('exposeBaseUri', 'text', [
                 'label' => 'Base Uri Expose api',
                 'attr'  => [

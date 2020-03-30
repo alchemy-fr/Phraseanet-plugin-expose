@@ -1,8 +1,7 @@
 expose_plugin:
     clientSecret: 2y5wvlnds8cgwwwwgsc4wgcco4c8gswgww4c48c8osgoocc88s
     clientId: aina-test_1buc6x7by0tcoccog444skg8g4sgg8gsos08cs4c88gc8s4w0c
-    oauthBaseUri: 'http://163.172.178.207:8060'
-    exposeBaseUri: 'http://163.172.178.207:8050'
+    exposeBaseUri: 'http://51.15.221.219:8150'
     token: NDIwMjQwNWQ3NDBkMjRlNjdmMzA0ZGZjZTdjYTkxNDljNDBiM2E4ZjU5NTk1NDIxNWY3MjAwNjcwNzUxZmU1NQ
 
 # example of jsondata to create publication

@@ -143,12 +143,12 @@ class ExposeController extends Controller
     private function generateAndSaveToken($config)
     {
         $oauthClient = new Client();
-        $tokenBody = $oauthClient->post($config['oauthBaseUri'] . '/oauth/v2/token', [
+        $tokenBody = $oauthClient->post($config['exposeBaseUri'] . '/oauth/v2/token', [
             'json' => [
                 'client_id'     => $config['clientId'],
                 'client_secret' => $config['clientSecret'],
                 'grant_type'    => 'client_credentials',
-                'scope'         => 'expose:publish'
+                'scope'         => 'publish'
             ]
         ])->getBody()->getContents();
 
