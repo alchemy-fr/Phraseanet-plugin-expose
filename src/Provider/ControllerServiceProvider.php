@@ -29,7 +29,7 @@ class ControllerServiceProvider implements PluginProviderInterface
         $app['expose_plugin.name'] = 'phraseanet-plugin-expose';
         $app['expose_plugin.version'] = '1.0.0';
 
-        $app['controller.admin.configuration'] = $app->share(function (PhraseaApplication $app) {
+        $app['controller.expose.admin.configuration'] = $app->share(function (PhraseaApplication $app) {
             return new AdminConfigurationController($app);
         });
 
@@ -118,7 +118,7 @@ class ControllerServiceProvider implements PluginProviderInterface
         /** @var Firewall $firewall */
         $firewall = $this->getFirewall($app);
 
-        $app->match('/expose-plugin/configuration', 'controller.admin.configuration:configurationAction')
+        $app->match('/expose-plugin/configuration', 'controller.expose.admin.configuration:configurationAction')
             ->method('GET|POST')
             ->before(function () use ($firewall) {
                 $firewall->requireAccessToModule('admin');
@@ -144,7 +144,7 @@ class ControllerServiceProvider implements PluginProviderInterface
     private function registerConfigurationTabs(Application $app)
     {
         $app['expose_plugin.configuration_tabs'] = [
-            'configuration' => 'expose_plugin.configuration_tabs.configuration',
+            'expose_configuration' => 'expose_plugin.configuration_tabs.configuration',
         ];
 
         $app['expose_plugin.configuration_tabs.configuration'] = $app->share(function (PhraseaApplication $app) {

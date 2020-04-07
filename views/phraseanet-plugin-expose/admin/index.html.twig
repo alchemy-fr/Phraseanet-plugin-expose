@@ -3,7 +3,7 @@
 {% block content %}
     <div>
         <!-- Nav tabs -->
-        <ul class="nav nav-tabs" id="configurationTabs">
+        <ul class="nav nav-tabs" id="expose-configurationTabs">
             {% for divId, configurationTab in configurationTabs %}
                 {% set tabTitle = configurationTab.title %}
                 <li class="{{ divId }}" role="presentation"><a href="#{{ divId }}" aria-controls="{{ divId }}" role="tab" data-toggle="tab" data-url="{{ configurationTab.url }}">{{ tabTitle|trans([], plugin.localeTextDomain) }}</a></li>
@@ -32,19 +32,19 @@
             return $.get(url);
         };
 
-        var tabs = $('#configurationTabs a[data-toggle="tab"]');
+        var tabs = $('#expose-configurationTabs a[data-toggle="tab"]');
 
         tabs.on('click', function(){
             $(this).tab('show');
         });
 
-        $('.nav-tabs .configuration').on('show.bs.tab', function (e) {
+        $('#expose-configurationTabs .expose_configuration').on('show.bs.tab', function (e) {
             if (e.target.hash != '#about' && contentsDownloaded[e.target.hash] === undefined) {
                 $(e.target.hash).empty().html('<img src="/assets/common/images/icons/main-loader.gif" alt="loading"/>');
             }
         });
 
-        $('.nav-tabs').on('shown.bs.tab', function (e) {
+        $('#expose-configurationTabs').on('shown.bs.tab', function (e) {
 
             if (e.target.hash != '#about' && contentsDownloaded[e.target.hash] === undefined) {
                 var targetDiv = $(e.target.hash);
