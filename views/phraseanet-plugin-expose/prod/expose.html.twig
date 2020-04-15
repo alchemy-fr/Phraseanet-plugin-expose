@@ -11,48 +11,70 @@
     <div class="tab-content">
         <div role="tabpanel" class="tab-pane fade in active" id="pubCreate">
             <div id='expose-plugin'>
+                <div class="form-group  field-entity"><label class="form-control-label"
+                                                             for="publication_parent">Parent</label>
+                    <div class="form-widget" id="publication-list-data">
+                        <select id="publication_parent" name="publication[parent]" tabindex="-1" aria-hidden="true">
+                            <option value="903fb4f0-06ca-41c2-9e7c-bbbb496fef06" readonly>Select a publication</option>
+                        </select>
+                    </div>
+                </div>
                 <div class="publication-block">
                     <form name="publication-data" id="publication-data-form">
                         <div class="left-publication inner-publication">
                             <div class="ui-widget">
-                                <label>title: </label>
+                                <label>Title: </label>
                                 <input type="text" value="" name="title"/>
                             </div>
                             <div class="ui-widget">
-                                <label>enabled: </label>
-                                <select id="enabled-combobox" name="enabled">
-                                    <option value="true">True</option>
-                                    <option value="false">False</option>
-                                </select>
+                                <label>Slug: </label>
+                                <input type="text" value="" name="slug"/>
                             </div>
                             <div class="ui-widget">
-                                <label>layout: </label>
-                                <input type="text" value="" name="layout"/>
+                                <label>Layout: </label>
+                                <select id="publication_layout" name="layout" class="form-control">
+                                    <option value="gallery" selected="selected">Gallery</option>
+                                    <option value="download">Download</option>
+                                </select>
                             </div>
                         </div>
                         <div class="right-publication inner-publication">
                             <div class="ui-widget">
-                                <label>publiclyListed: </label>
-                                <select id="publiclyListed-combobox" name="publiclyListed">
-                                    <option value="true">True</option>
-                                    <option value="false">False</option>
+                                <label>Enabled: </label>
+                                <select id="enabled-combobox" name="enabled">
+                                    <option value="true">true</option>
+                                    <option value="false">false</option>
                                 </select>
                             </div>
-
                             <div class="ui-widget">
-                                <label>slug: </label>
-                                <input type="text" value="" name="slug"/>
+                                <label>PubliclyListed: </label>
+                                <select id="publiclyListed-combobox" name="publiclyListed">
+                                    <option value="true">true</option>
+                                    <option value="false">false</option>
+                                </select>
                             </div>
                             <div class="ui-widget">
-                                <label>securityMethod: </label>
-                                <input type="text" value="" name="securityMethod"/>
+                                <label>SecurityMethod: </label>
+                                <select id="publication_securityMethod" name="securityMethod" class="form-control">
+                                    <option value=""></option>
+                                    <option value="password">password</option>
+                                    <option value="authentication">authentication</option>
+                                </select>
                             </div>
-                        </div>
-                        <div class="ui-widget">
-                            <label>securityOptions: </label>
-                            <textarea name="securityMethod">{}</textarea>
+                            <div class="ui-widget securityOptions visibility-hidden">
+                                <label>SecurityOptions: </label>
+                                <textarea name="securityMethod" value="{}" placeholder="{}"></textarea>
+                            </div>
                         </div>
                     </form>
+                    <div id="advancedSettingBlock">
+                        <h3 class="toggleSetting" >Advanced setting</h3>
+                        <div id="advancedSettingInner" class="hidden">
+                            <div>
+                                <textarea name="advancedSetting" id="advancedSetting" placeholder="{}" cols="80" rows="9"></textarea></div>
+
+                        </div>
+                    </div>
                     <div class="publication-btn-container">
                         <button type="button" class="btn btn-success" id="create-publication">
                             Create publication {% if lst %} from {{ lst|split(';')|length }} selected {% endif %}
@@ -67,6 +89,7 @@
         </div>
     </div>
 </div>
+
 <script type="text/javascript">
     // tab javascript
     var contentsDownloaded = {};
@@ -115,18 +138,59 @@
         });
     }
 
-    $(document).on('click', '#create-publication', function (e) {
-        e.preventDefault();
-        try {
-            $("#pub-error").addClass("hidden");
-            var allData = $('#publication-data-form').serializeArray();
+    /**Toggle display the Security option field**/
+    $("#publication_securityMethod").change(function (e) {
+        if ($(this).val() == 'password') {
+            $(".securityOptions").removeClass('visibility-hidden');
+        } else {
+            $(".securityOptions").addClass('visibility-hidden');
+        }
+    });
 
+
+    $(document).ready(function () {
+        $( ".toggleSetting" ).click(function(e){
+            $('#advancedSettingInner').toggleClass('hidden');
+        });
+        $.ajax({
+            type: "GET",
+            url: `{{ config.exposeBaseUri }}/publications`,
+            headers: {
+                'Authorization': 'Bearer ' + '{{ config.token }}',
+            },
+            success: function (data) {
+                data['hydra:member'].map(function (index) {
+                    $('#publication-list-data select').append('<option value="' + index.id + '" >' + index.title + '</option>');
+                });
+
+            }
+        });
+    });
+
+    function buildData() {
+        try {
+            var allData = $('#publication-data-form').serializeArray();
             var dataValue = allData.reduce((acc, it) => {
                 acc[it.name] = it.value;
                 return acc;
             }, {});
             booleanizeObject(dataValue);
-            console.log(JSON.stringify(dataValue));
+            $('#advancedSetting').val(JSON.stringify(dataValue, undefined, 4));
+            console.log($('#advancedSetting').val());
+        } catch (err) {
+            return;
+        }
+    }
+
+    $(document).on('change', 'form input, form select', function (e) {
+        buildData();
+    });
+
+
+    $(document).on('click', '#create-publication', function (e) {
+        e.preventDefault();
+        try {
+            $("#pub-error").addClass("hidden");
 
         } catch (err) {
             $("#pub-error").removeClass("hidden").text(err.message);
@@ -138,7 +202,7 @@
             dataType: 'json',
             data: {
                 lst: {{ lst|json_encode|raw }},
-                publicationData: JSON.stringify(dataValue)
+                publicationData: $('#advancedSetting').val()
             },
             success: function (data) {
                 if (data.success) {
@@ -161,11 +225,16 @@
     });
 </script>
 <style type="text/css">
+    .visibility-hidden {
+        visibility: hidden;
+    }
+
     .publication-block {
         padding: 12px 0;
         display: inline-block;
         overflow-y: auto;
     }
+
     .publication-block label {
         float: left;
         width: 100px;
@@ -175,23 +244,28 @@
         display: inline-block;
         vertical-align: middle;
     }
+
     .publication-block .ui-widget {
         margin: 0 0 16px 0;
         display: inline-block;
     }
-    .publication-block  input[type="text"] {
+
+    .publication-block input[type="text"] {
         margin: 2px;
     }
+
     .inner-publication {
         width: 50%;
         float: left;
     }
+
     .publication-btn-container {
         display: inline-block;
         width: 100%;
         text-align: center;
         margin-top: 30px;
     }
+
     #create-publication {
         border-radius: 16px;
         padding: 7px 18px;
@@ -199,4 +273,13 @@
         color: #fff;
         margin-bottom: 16px;
     }
+    #advancedSettingBlock {
+        text-align: center;
+    }
+    .publication-link {
+        display: inline-block;
+        padding: 10px 0;
+        text-decoration: underline;
+    }
 </style>
+
