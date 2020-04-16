@@ -13,26 +13,34 @@
             <div id='expose-plugin'>
                 <div class="form-group  field-entity"><label class="form-control-label"
                                                              for="publication_parent">Parent</label>
-                    <div class="form-widget" id="publication-list-data">
-                        <select id="publication_parent" name="publication[parent]" tabindex="-1" aria-hidden="true">
-                            <option value="903fb4f0-06ca-41c2-9e7c-bbbb496fef06" readonly>Select a publication</option>
-                        </select>
-                    </div>
+
                 </div>
                 <div class="publication-block">
                     <form name="publication-data" id="publication-data-form">
+                        <div class="parent_block">
+                            <div id="publication-list-data" class="ui-widget publication_parent_wrapper ">
+                                <select id="publication_parent" name="parentId" tabindex="-1" aria-hidden="true"
+                                        class="publication-field">
+                                    <option value="">Select a parent publication</option>
+                                </select>
+                            </div>
+                            <div class="parent_info publication_parent_wrapper" id="parent_info">
+
+                            </div>
+
+                        </div>
                         <div class="left-publication inner-publication">
                             <div class="ui-widget">
                                 <label>Title: </label>
-                                <input type="text" value="" name="title"/>
+                                <input type="text" value="" name="title" class="publication-field"/>
                             </div>
                             <div class="ui-widget">
                                 <label>Slug: </label>
-                                <input type="text" value="" name="slug"/>
+                                <input type="text" value="" name="slug" class="publication-field"/>
                             </div>
                             <div class="ui-widget">
                                 <label>Layout: </label>
-                                <select id="publication_layout" name="layout" class="form-control">
+                                <select id="publication_layout" name="layout" class="form-control publication-field">
                                     <option value="gallery" selected="selected">Gallery</option>
                                     <option value="download">Download</option>
                                 </select>
@@ -41,14 +49,14 @@
                         <div class="right-publication inner-publication">
                             <div class="ui-widget">
                                 <label>Enabled: </label>
-                                <select id="enabled-combobox" name="enabled">
+                                <select id="enabled-combobox" name="enabled" class="publication-field">
                                     <option value="true">true</option>
                                     <option value="false">false</option>
                                 </select>
                             </div>
                             <div class="ui-widget">
                                 <label>PubliclyListed: </label>
-                                <select id="publiclyListed-combobox" name="publiclyListed">
+                                <select id="publication_publiclyListed" name="publiclyListed" class="publication-field">
                                     <option value="true">true</option>
                                     <option value="false">false</option>
                                 </select>
@@ -61,17 +69,17 @@
                                     <option value="authentication">authentication</option>
                                 </select>
                             </div>
-                            <div class="ui-widget securityOptions visibility-hidden">
-                                <label>SecurityOptions: </label>
-                                <textarea name="securityMethod" value="{}" placeholder="{}"></textarea>
+                            <div class="ui-widget securityOptions_wrapper visibility-hidden">
                             </div>
+
                         </div>
                     </form>
                     <div id="advancedSettingBlock">
-                        <h3 class="toggleSetting" >Advanced setting</h3>
+                        <h3 class="toggleSetting">Advanced setting</h3>
                         <div id="advancedSettingInner" class="hidden">
                             <div>
-                                <textarea name="advancedSetting" id="advancedSetting" placeholder="{}" cols="80" rows="9"></textarea></div>
+                                <textarea name="advancedSetting" id="advancedSetting" cols="100"
+                                          rows="11"></textarea></div>
 
                         </div>
                     </div>
@@ -138,20 +146,12 @@
         });
     }
 
-    /**Toggle display the Security option field**/
-    $("#publication_securityMethod").change(function (e) {
-        if ($(this).val() == 'password') {
-            $(".securityOptions").removeClass('visibility-hidden');
-        } else {
-            $(".securityOptions").addClass('visibility-hidden');
-        }
-    });
-
 
     $(document).ready(function () {
-        $( ".toggleSetting" ).click(function(e){
+        $(".toggleSetting").click(function (e) {
             $('#advancedSettingInner').toggleClass('hidden');
         });
+        var test = '';
         $.ajax({
             type: "GET",
             url: `{{ config.exposeBaseUri }}/publications`,
@@ -159,31 +159,82 @@
                 'Authorization': 'Bearer ' + '{{ config.token }}',
             },
             success: function (data) {
+                console.log(data['hydra:member']);
                 data['hydra:member'].map(function (index) {
-                    $('#publication-list-data select').append('<option value="' + index.id + '" >' + index.title + '</option>');
+                    $('#publication-list-data select').append('<option value="' + index.id + '"  data-title= "' + index.title + '" data-slug= "' + index.slug + '" >' + index.title + '</option>');
                 });
 
             }
         });
+        console.log(test);
     });
 
     function buildData() {
         try {
             var allData = $('#publication-data-form').serializeArray();
+            console.log(allData);
             var dataValue = allData.reduce((acc, it) => {
                 acc[it.name] = it.value;
                 return acc;
             }, {});
             booleanizeObject(dataValue);
-            $('#advancedSetting').val(JSON.stringify(dataValue, undefined, 4));
-            console.log($('#advancedSetting').val());
+
+            return dataValue;
+
         } catch (err) {
             return;
         }
     }
 
-    $(document).on('change', 'form input, form select', function (e) {
-        buildData();
+    function removeSecurityField() {
+        var datavalueMinus = buildData();
+        if ($("#publication_securityMethod").val() == "") {
+            delete datavalueMinus['securityMethod'];
+        }
+        ;
+        if ($("#publication_parent").val() == "") {
+            delete datavalueMinus['parent'];
+        }
+        ;
+        $('#advancedSetting').val(JSON.stringify(datavalueMinus, undefined, 4));
+        console.log(JSON.stringify(datavalueMinus, undefined, 4));
+
+    }
+
+    $(document).on('change', '.publication-field', function (e) {
+        removeSecurityField();
+        /**Toggle display the Security option field**/
+        $("#publication_securityMethod").change(function (e) {
+            var dataValue = buildData();
+            var Svalue = $(this).val();
+            if (Svalue !== '') {
+                dataValue["securityMethod"] = Svalue;
+                $('#advancedSetting').val(JSON.stringify(dataValue, undefined, 4));
+                console.log(JSON.stringify(dataValue, undefined, 4));
+
+            }
+            ;
+
+            if (Svalue == 'password') {
+                $('.securityOptions_wrapper').html('').append('<label>Password: </label><input class="publication-field" type="text" name="password" />');
+                $(".securityOptions_wrapper").removeClass('visibility-hidden');
+
+            } else {
+                $(".securityOptions_wrapper").addClass('visibility-hidden');
+                $(".securityOptions_wrapper").html('');
+                removeSecurityField();
+            }
+
+        });
+
+    });
+
+    /**Selected Parent info **/
+    $(document).on('change', '#publication_parent', function (e) {
+        var selectedparent = $(this).children('option:selected');
+        if (selectedparent !== "") {
+            $('#parent_info').html('').append('<p>Title : ' + selectedparent.data('title') + '</p><p>Slug: ' + selectedparent.data('slug') + '</p>');
+        }
     });
 
 
@@ -273,13 +324,33 @@
         color: #fff;
         margin-bottom: 16px;
     }
+
     #advancedSettingBlock {
         text-align: center;
     }
+
     .publication-link {
         display: inline-block;
         padding: 10px 0;
         text-decoration: underline;
+    }
+
+    .parent_block {
+        padding: 15px;
+        background: grey;
+        margin-bottom: 20px;
+
+    }
+
+    .parent_block p {
+        color: #ffffff;
+        font-width: bold;
+    }
+
+    .publication_parent_wrapper {
+        display: inline-block;
+        width: 40%;
+        padding: 0 2%;
     }
 </style>
 
