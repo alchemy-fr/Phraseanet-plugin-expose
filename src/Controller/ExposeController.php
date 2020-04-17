@@ -14,10 +14,17 @@ class ExposeController extends Controller
 {
     public function exposeAction(PhraseaApplication $app, Request $request)
     {
+        $config = $app[ControllerServiceProvider::PLUGIN_NAMESPACE . '.config'];
+        $config = $config['expose_plugin'];
+        if (!isset($config['token'])) {
+            $config = $this->generateAndSaveToken($config);
+        }
+
         return $app->json([
             'content' => $app['twig']->render(
                 $app['expose_plugin.name'].'/prod/expose.html.twig', [
                     'lst'       => $request->get('lst'),
+                    'config'    => $config
                 ]
             )
         ]);

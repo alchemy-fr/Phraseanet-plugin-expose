@@ -11,9 +11,9 @@
         <tr>
             <td>
                 {% if publication.slug is null %}
-                    <a style='color:blue;' href="{{ exposeFrontUri ~ publication.id }}">{{ exposeFrontUri ~ publication.id }}</a>
+                    <a class="publication-link" href="{{ exposeFrontUri ~ publication.id }}">{{ exposeFrontUri ~ publication.id }}</a>
                 {% else %}
-                    <a style='color:blue;' href="{{ exposeFrontUri ~ publication.slug }}">{{ exposeFrontUri ~ publication.slug }}</a>
+                    <a class="publication-link" href="{{ exposeFrontUri ~ publication.slug }}">{{ exposeFrontUri ~ publication.slug }}</a>
                 {% endif %}
             </td>
             <td>{{ publication.title }}</td>
