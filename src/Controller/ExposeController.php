@@ -129,7 +129,7 @@ class ExposeController extends Controller
         $path = empty($publicationsResponse['slug']) ? $publicationsResponse['id'] : $publicationsResponse['slug'] ;
         $url = \p4string::addEndSlash($config['exposeFrontUri']) . $path;
 
-        $link = "<a style='color:blue;' href='" . $url . "'>" . $url . "</a>";
+        $link = "<a style='color:blue;' target='_blank' href='" . $url . "'>" . $url . "</a>";
 
         return $app->json([
             'success' => true,
