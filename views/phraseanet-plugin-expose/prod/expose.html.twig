@@ -11,6 +11,7 @@
     <div class="tab-content">
         <div role="tabpanel" class="tab-pane fade in active" id="pubCreate">
             <div id='expose-plugin'>
+                <div class="logo_expose"><img src="https://raw.githubusercontent.com/alchemy-fr/phraseanet-services/master/expose/front/public/logo192.png" width="192" height="192" alt="Expose logo" /></div>
                 <div class="form-group  field-entity"><label class="form-control-label"
                                                              for="publication_parent">Parent</label>
 
@@ -69,27 +70,33 @@
                                     <option value="authentication">authentication</option>
                                 </select>
                             </div>
+                            <div class="ui-widget publication_securityMethod_error hidden" id="publication_securityMethod_error">
+                                <p class="error form-error alert alert-error">Not implemented</p>
+                            </div>
                             <div class="ui-widget securityOptions_wrapper visibility-hidden">
+                                <label>Password: </label><input class="publication-field" type="text" name="password"/>
                             </div>
 
                         </div>
                     </form>
-                    <div id="advancedSettingBlock">
-                        <h3 class="toggleSetting">Advanced setting</h3>
-                        <div id="advancedSettingInner" class="hidden">
-                            <div>
+                    <form name="publication-json" id="publication-json">
+                        <div id="advancedSettingBlock">
+                            <h3 class="toggleSetting">Advanced setting</h3>
+                            <div id="advancedSettingInner" class="hidden">
+                                <div>
                                 <textarea name="advancedSetting" id="advancedSetting" cols="100"
                                           rows="11"></textarea></div>
 
+                            </div>
                         </div>
-                    </div>
-                    <div class="publication-btn-container">
-                        <button type="button" class="btn btn-success" id="create-publication">
-                            Create publication {% if lst %} from {{ lst|split(';')|length }} selected {% endif %}
-                        </button>
-                        <p><span id="pub-error" class="hidden alert alert-error"></span></p>
-                        <p><span id="pub-success" class="hidden alert alert-success"></span></p>
-                    </div>
+                        <div class="publication-btn-container">
+                            <button type="submit" class="btn btn-success" id="create-publication">
+                                Create publication {% if lst %} from {{ lst|split(';')|length }} selected {% endif %}
+                            </button>
+                            <p><span id="pub-error" class="hidden alert alert-error"></span></p>
+                            <p><span id="pub-success" class="hidden alert alert-success"></span></p>
+                        </div>
+                    </form>
                 </div>
             </div>
         </div>
@@ -149,6 +156,7 @@
 
     $(document).ready(function () {
         $(".toggleSetting").click(function (e) {
+            $(this).toggleClass('open');
             $('#advancedSettingInner').toggleClass('hidden');
         });
         var test = '';
@@ -193,15 +201,19 @@
         }
         ;
         if ($("#publication_parent").val() == "") {
-            delete datavalueMinus['parent'];
+            delete datavalueMinus['parentId'];
         }
+        if ($("#publication_securityMethod").val() !== "password") {
+            delete datavalueMinus['password'];
+        }
+
         ;
         $('#advancedSetting').val(JSON.stringify(datavalueMinus, undefined, 4));
         console.log(JSON.stringify(datavalueMinus, undefined, 4));
 
     }
 
-    $(document).on('change', '.publication-field', function (e) {
+    $('.publication-field').on('keyup change', function (e) {
         removeSecurityField();
         /**Toggle display the Security option field**/
         $("#publication_securityMethod").change(function (e) {
@@ -211,19 +223,22 @@
                 dataValue["securityMethod"] = Svalue;
                 $('#advancedSetting').val(JSON.stringify(dataValue, undefined, 4));
                 console.log(JSON.stringify(dataValue, undefined, 4));
-
+                if ( Svalue == 'authentication') {
+                    $("#publication_securityMethod_error").removeClass('hidden');
+                }else {
+                    $("#publication_securityMethod_error").addClass('hidden');
+                }
             }
-            ;
 
             if (Svalue == 'password') {
-                $('.securityOptions_wrapper').html('').append('<label>Password: </label><input class="publication-field" type="text" name="password" />');
                 $(".securityOptions_wrapper").removeClass('visibility-hidden');
 
             } else {
                 $(".securityOptions_wrapper").addClass('visibility-hidden');
-                $(".securityOptions_wrapper").html('');
                 removeSecurityField();
-            }
+            };
+
+
 
         });
 
@@ -232,13 +247,15 @@
     /**Selected Parent info **/
     $(document).on('change', '#publication_parent', function (e) {
         var selectedparent = $(this).children('option:selected');
-        if (selectedparent !== "") {
+        if (selectedparent.val() !== "") {
             $('#parent_info').html('').append('<p>Title : ' + selectedparent.data('title') + '</p><p>Slug: ' + selectedparent.data('slug') + '</p>');
+        } else {
+            $('#parent_info').html('');
         }
     });
 
 
-    $(document).on('click', '#create-publication', function (e) {
+    $(document).on('submit', '#publication-json', function (e) {
         e.preventDefault();
         try {
             $("#pub-error").addClass("hidden");
@@ -351,6 +368,41 @@
         display: inline-block;
         width: 40%;
         padding: 0 2%;
+    }
+
+    h3.toggleSetting {
+        position: relative;
+        font-size: 18px;
+        display: inline-block;
+        width: 100%;
+    }
+
+    .toggleSetting:after {
+        padding-left: 10px;
+        content: "\f078";
+        font-family: fontawesome;
+    }
+
+    .toggleSetting.open:after {
+        content: "\f077";
+        font-family: fontawesome;
+    }
+    .form-error {
+        margin-left: 104px;
+    }
+    #expose-plugin {
+        padding-top: 40px;
+        position: relative;
+    }
+    .logo_expose {
+        position: absolute;
+        width: 60px;
+        right: 0;
+        top: 0;
+    }
+    #advancedSetting {
+        max-width: 100%;
+        width: 355px;
     }
 </style>
 
