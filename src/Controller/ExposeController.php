@@ -97,7 +97,7 @@ class ExposeController extends Controller
         /** @var \record_adapter $record */
         foreach ($records as $record) {
             try {
-                $exposeClient->post('/assets', [
+                $response = $exposeClient->post('/assets', [
                     'headers' => [
                         'Authorization' => 'Bearer ' . $config['token']
                     ],
@@ -118,6 +118,39 @@ class ExposeController extends Controller
 
                     ]
                 ]);
+
+                if ($response->getStatusCode() !==201) {
+                    return $app->json([
+                        'success' => false,
+                        'message' => "An error occurred when creating asset: status-code " . $response->getStatusCode()
+                    ]);
+                }
+                $assetsResponse = json_decode($response->getBody(),true);
+
+                // add preview sub-definition
+
+                $this->postSubDefinition(
+                    $exposeClient,
+                    $config['token'],
+                    $record->get_subdef('preview')->getRealPath(),
+                    $assetsResponse['id'],
+                    'preview',
+                    true
+                );
+
+                // add thumbnail sub-definition
+
+                $this->postSubDefinition(
+                    $exposeClient,
+                    $config['token'],
+                    $record->get_subdef('thumbnail')->getRealPath(),
+                    $assetsResponse['id'],
+                    'thumbnail',
+                    false,
+                    true
+                );
+
+
             } catch (\Exception $e) {
                 return $app->json([
                     'success' => false,
@@ -146,6 +179,38 @@ class ExposeController extends Controller
                 'Content-Type'  => 'application/json'
             ],
             'json' => $publicationData
+        ]);
+    }
+
+    private function postSubDefinition(Client $exposeClient, $token, $path, $assetId, $subdefName, $isPreview = false, $isThumbnail = false)
+    {
+        return $exposeClient->post('/sub-definitions', [
+            'headers' => [
+                'Authorization' => 'Bearer ' .$token
+            ],
+            'multipart' => [
+                [
+                    'name'      => 'file',
+                    'contents'  => fopen($path, 'r')
+                ],
+                [
+                    'name'      => 'asset_id',
+                    'contents'  => $assetId,
+
+                ],
+                [
+                    'name'      => 'name',
+                    'contents'  => $subdefName
+                ],
+                [
+                    'name'      => 'use_as_preview',
+                    'contents'  => $isPreview
+                ],
+                [
+                    'name'      => 'use_as_thumbnail',
+                    'contents'  => $isThumbnail
+                ]
+            ]
         ]);
     }
 
