@@ -255,7 +255,7 @@
     });
 
 
-    $(document).on('submit', '#publication-json', function (e) {
+    $('#publication-json').on('submit', function (e) {
         e.preventDefault();
         try {
             $("#pub-error").addClass("hidden");
@@ -282,7 +282,7 @@
             }
         });
     });
-    $(document).on('keyup', '.publication-data', function (e) {
+    $('.publication-field').on('keyup change', function (e) {
         try {
             $("#pub-success").addClass("hidden");
             $("#pub-error").addClass("hidden");
