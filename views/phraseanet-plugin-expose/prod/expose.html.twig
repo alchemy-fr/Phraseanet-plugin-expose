@@ -11,7 +11,9 @@
     <div class="tab-content">
         <div role="tabpanel" class="tab-pane fade in active" id="pubCreate">
             <div id='expose-plugin'>
-                <div class="logo_expose"><img src="https://raw.githubusercontent.com/alchemy-fr/phraseanet-services/master/expose/front/public/logo192.png" width="192" height="192" alt="Expose logo" /></div>
+                <div class="logo_expose"><img
+                            src="https://raw.githubusercontent.com/alchemy-fr/phraseanet-services/master/expose/front/public/logo192.png"
+                            width="192" height="192" alt="Expose logo"/></div>
                 <div class="form-group  field-entity"><label class="form-control-label"
                                                              for="publication_parent">Parent</label>
 
@@ -45,7 +47,8 @@
                             </div>
                             <div class="ui-widget profile-wrapper hide">
                                 <label>Profile: </label>
-                                <input type="text" value="" name="profile" class="publication-field" id="profile-field"/>
+                                <input type="text" value="" name="profile" class="publication-field"
+                                       id="profile-field"/>
                             </div>
 
                         </div>
@@ -53,14 +56,16 @@
                             <div class="ui-widget">
                                 <label>Layout: </label>
                                 <select id="publication_layout" name="layout" class="form-control publication-field">
-                                    <option value="gallery" selected="selected">Gallery</option>
+                                    <option value="" selected="selected"></option>
+                                    <option value="gallery">Gallery</option>
                                     <option value="mapbox">Mapbox</option>
                                     <option value="download">Download</option>
                                 </select>
                             </div>
                             <div class="ui-widget">
                                 <label>Enabled: </label>
-                                <select id="enabled-combobox" name="enabled" class="publication-field">
+                                <select id="enabled_combobox" name="enabled" class="publication-field">
+                                    <option value="" selected="selected"></option>
                                     <option value="true">true</option>
                                     <option value="false">false</option>
                                 </select>
@@ -68,6 +73,7 @@
                             <div class="ui-widget">
                                 <label>PubliclyListed: </label>
                                 <select id="publication_publiclyListed" name="publiclyListed" class="publication-field">
+                                    <option value="" selected="selected"></option>
                                     <option value="true">true</option>
                                     <option value="false">false</option>
                                 </select>
@@ -75,16 +81,18 @@
                             <div class="ui-widget">
                                 <label>SecurityMethod: </label>
                                 <select id="publication_securityMethod" name="securityMethod" class="form-control">
-                                    <option value=""></option>
+                                    <option value="" selected="selected"></option>
                                     <option value="password">password</option>
                                     <option value="authentication">authentication</option>
                                 </select>
                             </div>
-                            <div class="ui-widget publication_securityMethod_error hidden" id="publication_securityMethod_error">
+                            <div class="ui-widget publication_securityMethod_error hidden"
+                                 id="publication_securityMethod_error">
                                 <p class="error form-error alert alert-error">Not implemented</p>
                             </div>
                             <div class="ui-widget securityOptions_wrapper visibility-hidden">
-                                <label>Password: </label><input class="publication-field" type="text" name="password"/>
+                                <label>Password: </label><input class="publication-field" type="text" name="password"
+                                                                id="publication_password"/>
                             </div>
 
                         </div>
@@ -199,32 +207,27 @@
             /**Build Config elt**/
             var config = {};
 
-            if(dataValue.layout != '') {
-                config = {...config, layout : dataValue.layout };
+            if (dataValue.layout != '') {
+                config = {...config, layout: dataValue.layout};
             }
-            if(dataValue.enabled != '') {
-                config = {...config, enabled : dataValue.enabled };
+            if (dataValue.enabled != '') {
+                config = {...config, enabled: dataValue.enabled};
             }
-            if(dataValue.publiclyListed != '') {
-                config = {...config, publiclyListed : dataValue.publiclyListed };
+            if (dataValue.publiclyListed != '') {
+                config = {...config, publiclyListed: dataValue.publiclyListed};
             }
-            if(dataValue.securityMethod != '') {
-                config = {...config, securityMethod : dataValue.securityMethod };
+            if (dataValue.securityMethod != '') {
+                config = {...config, securityMethod: dataValue.securityMethod};
             }
-            if(dataValue.password) {
-                config = {...config, password : dataValue.password };
+            if (dataValue.password) {
+                config = {...config, password: dataValue.password};
             }
 
-            dataValue = { ...dataValue, config};
+            dataValue = {...dataValue, config};
 
 
             booleanizeObject(dataValue);
 
-            /*            delete dataValue['layout'];
-                        delete dataValue['enabled'];
-                        delete dataValue['publiclyListed'];
-                        delete dataValue['password'];
-                        delete dataValue['securityMethod'];*/
 
             return dataValue;
 
@@ -235,9 +238,7 @@
 
     function removeSecurityField() {
         var datavalueMinus = buildData();
-        if ($("#publication_securityMethod").val() == "") {
-            delete datavalueMinus['securityMethod'];
-        }
+        
         if ($("#publication_parent").val() == "") {
             delete datavalueMinus['parentId'];
         }
@@ -268,11 +269,14 @@
             if (Svalue !== '') {
                 dataValue["securityMethod"] = Svalue;
 
-                if ( Svalue == 'authentication') {
+                if (Svalue == 'authentication') {
+                    $("#publication_password").val('');
                     $("#publication_securityMethod_error").removeClass('hidden');
-                }else {
+                } else {
                     $("#publication_securityMethod_error").addClass('hidden');
                 }
+            } else {
+                $("#publication_password").val('');
             };
             removeSecurityField();
             if (Svalue == 'password') {
@@ -286,9 +290,9 @@
 
         /**checkbox to show profile field **/
         checkProfile = $("#add-profile").is(":checked");
-        if(checkProfile){
+        if (checkProfile) {
             $(".profile-wrapper").removeClass("hide");
-        }else {
+        } else {
             $(".profile-wrapper").addClass("hide");
             $("#profile-field").val('');
             removeSecurityField();
@@ -370,6 +374,7 @@
         margin: 0 0 16px 0;
         display: inline-block;
     }
+
     .publication-block .ui-widget.hide {
         display: none;
     }
@@ -443,19 +448,23 @@
         content: "\f077";
         font-family: fontawesome;
     }
+
     .form-error {
         margin-left: 104px;
     }
+
     #expose-plugin {
         padding-top: 15px;
         position: relative;
     }
+
     .logo_expose {
         position: absolute;
         width: 32px;
         right: 0;
         top: 0;
     }
+
     #advancedSetting {
         max-width: 100%;
         width: 355px;
