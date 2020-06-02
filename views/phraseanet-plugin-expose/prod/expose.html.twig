@@ -40,14 +40,24 @@
                                 <input type="text" value="" name="slug" class="publication-field"/>
                             </div>
                             <div class="ui-widget">
+                                <label>Add profile: </label>
+                                <input id="add-profile" type="checkbox" class="publication-field"/>
+                            </div>
+                            <div class="ui-widget profile-wrapper hide">
+                                <label>Profile: </label>
+                                <input type="text" value="" name="profile" class="publication-field" id="profile-field"/>
+                            </div>
+
+                        </div>
+                        <div class="right-publication inner-publication">
+                            <div class="ui-widget">
                                 <label>Layout: </label>
                                 <select id="publication_layout" name="layout" class="form-control publication-field">
                                     <option value="gallery" selected="selected">Gallery</option>
+                                    <option value="mapbox">Mapbox</option>
                                     <option value="download">Download</option>
                                 </select>
                             </div>
-                        </div>
-                        <div class="right-publication inner-publication">
                             <div class="ui-widget">
                                 <label>Enabled: </label>
                                 <select id="enabled-combobox" name="enabled" class="publication-field">
@@ -185,7 +195,36 @@
                 acc[it.name] = it.value;
                 return acc;
             }, {});
+
+            /**Build Config elt**/
+            var config = {};
+
+            if(dataValue.layout != '') {
+                config = {...config, layout : dataValue.layout };
+            }
+            if(dataValue.enabled != '') {
+                config = {...config, enabled : dataValue.enabled };
+            }
+            if(dataValue.publiclyListed != '') {
+                config = {...config, publiclyListed : dataValue.publiclyListed };
+            }
+            if(dataValue.securityMethod != '') {
+                config = {...config, securityMethod : dataValue.securityMethod };
+            }
+            if(dataValue.password) {
+                config = {...config, password : dataValue.password };
+            }
+
+            dataValue = { ...dataValue, config};
+
+
             booleanizeObject(dataValue);
+
+            /*            delete dataValue['layout'];
+                        delete dataValue['enabled'];
+                        delete dataValue['publiclyListed'];
+                        delete dataValue['password'];
+                        delete dataValue['securityMethod'];*/
 
             return dataValue;
 
@@ -199,15 +238,21 @@
         if ($("#publication_securityMethod").val() == "") {
             delete datavalueMinus['securityMethod'];
         }
-        ;
         if ($("#publication_parent").val() == "") {
             delete datavalueMinus['parentId'];
         }
-        if ($("#publication_securityMethod").val() !== "password") {
-            delete datavalueMinus['password'];
-        }
 
+        if ($("#profile-field").val() == "") {
+            delete datavalueMinus['profile'];
+        }
         ;
+
+        delete datavalueMinus['layout'];
+        delete datavalueMinus['enabled'];
+        delete datavalueMinus['publiclyListed'];
+        delete datavalueMinus['password'];
+        delete datavalueMinus['securityMethod'];
+
         $('#advancedSetting').val(JSON.stringify(datavalueMinus, undefined, 4));
         console.log(JSON.stringify(datavalueMinus, undefined, 4));
 
@@ -218,29 +263,36 @@
         /**Toggle display the Security option field**/
         $("#publication_securityMethod").change(function (e) {
             var dataValue = buildData();
+            dataValue["securityMethod"] = '';
             var Svalue = $(this).val();
             if (Svalue !== '') {
                 dataValue["securityMethod"] = Svalue;
-                $('#advancedSetting').val(JSON.stringify(dataValue, undefined, 4));
-                console.log(JSON.stringify(dataValue, undefined, 4));
+
                 if ( Svalue == 'authentication') {
                     $("#publication_securityMethod_error").removeClass('hidden');
                 }else {
                     $("#publication_securityMethod_error").addClass('hidden');
                 }
-            }
-
+            };
+            removeSecurityField();
             if (Svalue == 'password') {
                 $(".securityOptions_wrapper").removeClass('visibility-hidden');
 
             } else {
                 $(".securityOptions_wrapper").addClass('visibility-hidden');
-                removeSecurityField();
             };
 
-
-
         });
+
+        /**checkbox to show profile field **/
+        checkProfile = $("#add-profile").is(":checked");
+        if(checkProfile){
+            $(".profile-wrapper").removeClass("hide");
+        }else {
+            $(".profile-wrapper").addClass("hide");
+            $("#profile-field").val('');
+            removeSecurityField();
+        }
 
     });
 
@@ -286,7 +338,8 @@
         try {
             $("#pub-success").addClass("hidden");
             $("#pub-error").addClass("hidden");
-            JSON.parse($(this).val());
+            // JSON.parse($(this).val());
+            jQuery.parseJSON(JSON.stringify($(this).val()));
         } catch (err) {
             $("#pub-error").removeClass("hidden").text(err.message);
         }
@@ -316,6 +369,9 @@
     .publication-block .ui-widget {
         margin: 0 0 16px 0;
         display: inline-block;
+    }
+    .publication-block .ui-widget.hide {
+        display: none;
     }
 
     .publication-block input[type="text"] {
