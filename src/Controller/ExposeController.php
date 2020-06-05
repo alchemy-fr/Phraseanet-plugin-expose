@@ -7,6 +7,7 @@ use Alchemy\ExposePlugin\Provider\ControllerServiceProvider;
 use Alchemy\Phrasea\Application as PhraseaApplication;
 use Alchemy\Phrasea\Controller\Controller;
 use Alchemy\Phrasea\Controller\RecordsRequest;
+use Alchemy\Phrasea\Twig\PhraseanetExtension;
 use GuzzleHttp\Client;
 use Symfony\Component\HttpFoundation\Request;
 
@@ -30,7 +31,7 @@ class ExposeController extends Controller
         ]);
     }
 
-    public function listPublicationAction(PhraseaApplication $app, Request $request)
+    public function listPublicationAction(PhraseaApplication $app)
     {
         $config = $app[ControllerServiceProvider::PLUGIN_NAMESPACE . '.config'];
         $config = $config['expose_plugin'];
@@ -97,26 +98,81 @@ class ExposeController extends Controller
         /** @var \record_adapter $record */
         foreach ($records as $record) {
             try {
+                $helpers = new PhraseanetExtension($app);
+                $canSeeBusiness = $helpers->isGrantedOnCollection($record->getBaseId(), [\ACL::CANMODIFRECORD]);
+
+                $captionsByfield = $record->getCaption($helpers->getCaptionFieldOrder($record, $canSeeBusiness));
+
+                $description = "<dl>";
+
+                foreach ($captionsByfield as $name => $value) {
+                    if ($helpers->getCaptionFieldGuiVisible($record, $name) == 1) {
+                        $description .= "<dt>" . $helpers->getCaptionFieldLabel($record, $name). "</dt>";
+                        $description .= "<dd>" . $helpers->getCaptionField($record, $name, $value). "</dd>";
+                    }
+                }
+
+                $description .= "</dl>";
+
+                $databox = $record->getDatabox();
+                $caption = $record->get_caption();
+                $lat = $lng = null;
+
+                foreach ($databox->get_meta_structure() as $meta) {
+                    if (strpos(strtolower($meta->get_name()), 'longitude') !== FALSE  && $caption->has_field($meta->get_name())) {
+                        // retrieve value for the corresponding field
+                        $fieldValues = $record->get_caption()->get_field($meta->get_name())->get_values();
+                        $fieldValue = array_pop($fieldValues);
+                        $lng = $fieldValue->getValue();
+
+                    } elseif (strpos(strtolower($meta->get_name()), 'latitude') !== FALSE  && $caption->has_field($meta->get_name())) {
+                        // retrieve value for the corresponding field
+                        $fieldValues = $record->get_caption()->get_field($meta->get_name())->get_values();
+                        $fieldValue = array_pop($fieldValues);
+                        $lat = $fieldValue->getValue();
+
+                    }
+                }
+
+                $multipartArray = [
+                    [
+                        'name'      => 'file',
+                        'contents'  => fopen($record->get_subdef('document')->getRealPath(), 'r')
+                    ],
+                    [
+                        'name'      => 'publication_id',
+                        'contents'  => $publicationsResponse['id'],
+
+                    ],
+                    [
+                        'name'      => 'slug',
+                        'contents'  => 'asset_'. $record->getId()
+                    ],
+                    [
+                        'name'      => 'description',
+                        'contents'  => $description
+                    ]
+                ];
+
+                if ($lat !== null) {
+                    array_push($multipartArray, [
+                        'name'      => 'lat',
+                        'contents'  => $lat
+                    ]);
+                }
+
+                if ($lng !== null) {
+                    array_push($multipartArray, [
+                        'name'      => 'lng',
+                        'contents'  => $lng
+                    ]);
+                }
+
                 $response = $exposeClient->post('/assets', [
                     'headers' => [
                         'Authorization' => 'Bearer ' . $config['token']
                     ],
-                    'multipart' => [
-                        [
-                            'name'      => 'file',
-                            'contents'  => fopen($record->get_subdef('document')->getRealPath(), 'r')
-                        ],
-                        [
-                            'name'      => 'publication_id',
-                            'contents'  => $publicationsResponse['id'],
-
-                        ],
-                        [
-                            'name'      => 'slug',
-                            'contents'  => 'asset_'. $record->getId()
-                        ]
-
-                    ]
+                    'multipart' => $multipartArray
                 ]);
 
                 if ($response->getStatusCode() !==201) {
@@ -125,6 +181,7 @@ class ExposeController extends Controller
                         'message' => "An error occurred when creating asset: status-code " . $response->getStatusCode()
                     ]);
                 }
+
                 $assetsResponse = json_decode($response->getBody(),true);
 
                 // add preview sub-definition
